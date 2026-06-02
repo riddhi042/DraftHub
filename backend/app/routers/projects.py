@@ -3,6 +3,7 @@ from psycopg import Connection
 from psycopg.rows import dict_row
 
 from app.db.database import get_connection
+from app.schemas.project import ProjectCreate
 
 router = APIRouter(
     prefix="/projects",
