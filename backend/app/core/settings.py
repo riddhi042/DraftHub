@@ -8,11 +8,17 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
 
+    # PostgreSQL
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
     postgres_host: str = "localhost"
     postgres_port: int = 5432
     postgres_db: str = "drafthub"
+    upload_dir: str = "uploads"
+    # JWT Auth
+    secret_key: str = "change-me-to-a-long-random-secret"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",

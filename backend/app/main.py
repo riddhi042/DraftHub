@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.settings import get_settings
-from app.routers import projects
+from app.routers import auth, blueprints, members, projects
 
 settings = get_settings()
 
@@ -9,7 +10,20 @@ app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,
 )
+
+# CORS — allows frontend to talk to backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(projects.router)
+app.include_router(auth.router)
+app.include_router(blueprints.router)
+app.include_router(members.router)
 
 
 @app.get("/")
