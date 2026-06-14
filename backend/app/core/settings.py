@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
     postgres_db: str = "drafthub"
     upload_dir: str = "uploads"
+    gmail_user: str = ""
+    gmail_app_password: str = ""
+    redis_host: str = "localhost"
+    redis_port: int = 6379  
+    resend_api_key: str = ""
+    resend_from_email: str = "onboarding@resend.dev"
     # JWT Auth
     secret_key: str = "change-me-to-a-long-random-secret"
     algorithm: str = "HS256"
