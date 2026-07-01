@@ -36,11 +36,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        working-directory: backend
         run: pip install -r requirements.txt
 
       - name: Run tests
-        working-directory: backend
         env:
           POSTGRES_USER: drafthub_user
           POSTGRES_PASSWORD: drafthub_pass
@@ -55,7 +53,7 @@ jobs:
           GMAIL_APP_PASSWORD: testpassword
           RESEND_API_KEY: test
           RESEND_FROM_EMAIL: test@test.com
-        run: pytest tests/ -v
+        run: pytest backend/tests/ -v
 
   build-docker:
     name: Build Docker Image
