@@ -10,3 +10,11 @@ services:
     image: redis:8
     ports:
       - "6379:6379"
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: drafthub
+    ports:
+      - "5432:5432"
