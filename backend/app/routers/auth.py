@@ -1,19 +1,15 @@
-# backend/app/routers/auth.py
 import secrets
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from psycopg import Connection
 from psycopg.rows import dict_row
 from pydantic import BaseModel, EmailStr
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 from app.auth.utils import create_access_token, hash_password, verify_password
 from app.db.database import get_connection
 from app.services.email import send_verification_email, send_welcome_email
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
-limiter = Limiter(key_func=get_remote_address)
 
 
 class RegisterRequest(BaseModel):
@@ -55,7 +51,6 @@ def register(body: RegisterRequest, connection: Connection = Depends(get_connect
         user = cursor.fetchone()
         connection.commit()
 
-    # Send verification email
     send_verification_email(body.email, body.username, verification_token)
 
     return {
@@ -86,14 +81,11 @@ def verify_email(token: str, connection: Connection = Depends(get_connection)):
         connection.commit()
 
     send_welcome_email(user["email"], user["username"])
-
     return {"message": "Email verified successfully. You can now log in."}
 
 
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit("5/minute")
 def login(
-    request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     connection: Connection = Depends(get_connection),
 ):
@@ -116,12 +108,6 @@ def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is inactive.",
         )
-
-    # if not user["is_verified"]:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Please verify your email before logging in.",
-    #     )
 
     token = create_access_token({"sub": str(user["id"])})
     return {"access_token": token, "token_type": "bearer"}

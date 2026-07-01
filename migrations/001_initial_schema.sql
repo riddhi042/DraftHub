@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TYPE IF NOT EXISTS member_role AS ENUM ('owner', 'editor', 'viewer');
+CREATE TYPE member_role AS ENUM ('owner', 'editor', 'viewer');
 
 CREATE TABLE IF NOT EXISTS project_members (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -59,20 +59,4 @@ CREATE TABLE IF NOT EXISTS blueprint_revisions (
     UNIQUE (blueprint_id, version_number)
 );
 
-CREATE TABLE IF NOT EXISTS activity_logs (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id    INT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    actor_id      UUID REFERENCES users(id) ON DELETE SET NULL,
-    event_type    VARCHAR(100) NOT NULL,
-    description   TEXT,
-    metadata_json TEXT,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_projects_owner ON projects(owner_id);
-CREATE INDEX IF NOT EXISTS idx_project_members_project ON project_members(project_id);
-CREATE INDEX IF NOT EXISTS idx_project_members_user ON project_members(user_id);
-CREATE INDEX IF NOT EXISTS idx_blueprints_project ON blueprints(project_id);
-CREATE INDEX IF NOT EXISTS idx_revisions_blueprint ON blueprint_revisions(blueprint_id);
-CREATE INDEX IF NOT EXISTS idx_activity_project ON activity_logs(project_id);
-CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_logs(created_at);
+CREATE TABLE IF NOT EXISTS

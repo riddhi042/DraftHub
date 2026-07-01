@@ -1,7 +1,5 @@
-# tests/conftest.py
 import pytest
 from fastapi.testclient import TestClient
-
 from app.main import app
 
 
@@ -13,7 +11,6 @@ def client():
 
 @pytest.fixture(scope="module")
 def auth_headers(client):
-    # Register a test user
     client.post("/auth/register", json={
         "email": "pytest@example.com",
         "username": "pytestuser",
@@ -21,7 +18,17 @@ def auth_headers(client):
         "full_name": "Pytest User",
     })
 
-    # Login and get token
+    # Verify user directly in DB for testing
+    from app.db.database import get_connection
+    conn = next(get_connection())
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE users SET is_verified = TRUE WHERE email = %s",
+            ("pytest@example.com",)
+        )
+        conn.commit()
+    conn.close()
+
     response = client.post("/auth/login", data={
         "username": "pytest@example.com",
         "password": "test1234",
