@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Run database migrations
+        env:
+          PGPASSWORD: drafthub_pass
+        run: psql -h localhost -U drafthub_user -d drafthub -f migrations/001_initial_schema.sql
+
       - name: Run tests
         env:
           POSTGRES_USER: drafthub_user
@@ -53,6 +58,8 @@ jobs:
           GMAIL_APP_PASSWORD: testpassword
           RESEND_API_KEY: test
           RESEND_FROM_EMAIL: test@test.com
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
         run: pytest backend/tests/ -v
 
   build-docker:
