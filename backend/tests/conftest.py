@@ -1,6 +1,10 @@
 import pytest
+import psycopg
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.settings import get_settings
+
+settings = get_settings()
 
 
 @pytest.fixture(scope="module")
@@ -19,15 +23,19 @@ def auth_headers(client):
     })
 
     # Verify user directly in DB for testing
-    from app.db.database import get_connection
-    conn = next(get_connection())
-    with conn.cursor() as cursor:
-        cursor.execute(
-            "UPDATE users SET is_verified = TRUE WHERE email = %s",
-            ("pytest@example.com",)
-        )
+    with psycopg.connect(
+        user=settings.postgres_user,
+        password=settings.postgres_password,
+        host=settings.postgres_host,
+        port=settings.postgres_port,
+        dbname=settings.postgres_db,
+    ) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE users SET is_verified = TRUE WHERE email = %s",
+                ("pytest@example.com",)
+            )
         conn.commit()
-    conn.close()
 
     response = client.post("/auth/login", data={
         "username": "pytest@example.com",
